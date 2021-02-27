@@ -14,9 +14,12 @@ OBJPATH := obj
 CXX := amd64-elf-g++
 INCLUDES := -Isrc
 
-CXXFLAGS_BASE := -std=c++11 -ffreestanding -O3
+CXXFLAGS_BASE := -std=c++11 -ffreestanding -O3 -fpic -fpie
 CXXFLAGS_WARN := -Wall -Wextra -Werror
-CXXFLAGS_EXCLUDE := -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-stack-protector -fpic -fpie -fomit-frame-pointer -mno-red-zone -mno-80387 -mno-mmx -mno-3dnow -mno-sse
+CXXFLAGS_EXCLUDE := -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-stack-protector -fomit-frame-pointer -mno-red-zone -mno-80387 -mno-mmx -mno-3dnow -mno-sse
+ifdef shared
+CXXFLAGS_BASE += -export-dynamic -shared
+endif
 CXXFLAGS := $(INCLUDES) $(CXXFLAGS_BASE) $(CXXFLAGS_WARN) $(CXXFLAGS_EXCLUDE)
 
 ifdef asm
@@ -25,11 +28,18 @@ ASMFLAGS := -f elf64
 endif
 
 
+ifdef shared
+LINKER := amd64-elf-ld
+LINKER_FLAGS += -shared
+else
 LINKER := $(CXX)
-ifdef LINKER_FILE
-LINKER_FLAGS := -T $(LINKER_FILE)
+LINKER_FLAGS += -pie
 endif
-LINKER_FLAGS := $(LINKER_FLAGS) -nostdlib -pie -z max-page-size=0x1000
+
+ifdef LINKER_FILE
+LINKER_FLAGS += -T $(LINKER_FILE)
+endif
+LINKER_FLAGS += -nostdlib -z max-page-size=0x1000
 
 
 CXX_OBJS := $(shell cd src && find . -type f -iname '*.cpp' | sed 's/\.\///g' | sed 's/\.cpp/\.o/g' | xargs -I {} echo "$(OBJPATH)/"{})
