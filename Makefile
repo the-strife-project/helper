@@ -1,11 +1,16 @@
 # This is a given Makefile for all jotaOS user space programs
 # Read the documentation to understand its options
 
+ERR_PROJNAME := You have to set a project name (PROJNAME)
+ERR_RESULT := You have to set a result file (RESULT)
+ERR_HEADERS := Please set the JOTAOS_STDLIB_HEADERS environment variable to the pubheaders/ directory of stdlib
+ERR_LIBS := Please set the JOTAOS_LIBS environment variable to a directory containing the requested libraries
+
 ifndef PROJNAME
-$(error You have to set a project name (PROJNAME))
+$(error $(ERR_PROJNAME))
 endif
 ifndef RESULT
-$(error You have to set a result file (RESULT))
+$(error $(ERR_RESULT))
 endif
 
 SRCPATH := src
@@ -13,6 +18,12 @@ OBJPATH := obj
 
 CXX := amd64-elf-g++
 INCLUDES := -Isrc
+ifndef nostdlibh
+ifndef JOTAOS_STDLIB_HEADERS
+$(error $(ERR_HEADERS))
+endif
+INCLUDES += -I "$(JOTAOS_STDLIB_HEADERS)"
+endif
 
 CXXFLAGS_BASE := -std=c++11 -ffreestanding -O3 -fpic -fpie
 CXXFLAGS_WARN := -Wall -Wextra -Werror
@@ -34,6 +45,13 @@ LINKER_FLAGS += -shared
 else
 LINKER := $(CXX)
 LINKER_FLAGS += -pie
+endif
+
+ifndef nostdlib
+ifndef JOTAOS_LIBS
+$(error $(ERR_LIBS))
+endif
+LINKER_FLAGS += -L$(JOTAOS_LIBS) -lstd
 endif
 
 ifdef LINKER_FILE
