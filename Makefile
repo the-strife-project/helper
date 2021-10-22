@@ -58,6 +58,7 @@ ifdef LINKER_FILE
 LINKER_FLAGS += -T $(LINKER_FILE)
 endif
 LINKER_FLAGS += -nostdlib -z max-page-size=0x1000
+LINKER_FLAGS += -z relro -z now
 
 
 CXX_OBJS := $(shell cd src && find . -type f -iname '*.cpp' | sed 's/\.\///g' | sed 's/\.cpp/\.o/g' | xargs -I {} echo "$(OBJPATH)/"{})
