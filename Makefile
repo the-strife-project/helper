@@ -16,6 +16,7 @@ endif
 SRCPATH := src
 OBJPATH := obj
 
+# --- CXX ---
 CXX := amd64-elf-g++
 INCLUDES := -Isrc
 ifndef nostdlibh
@@ -31,6 +32,9 @@ CXXFLAGS_EXCLUDE := -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-stack-pro
 ifdef shared
 CXXFLAGS_BASE += -export-dynamic -shared
 endif
+ifdef static
+CXXFLAGS_BASE += -static
+endif
 CXXFLAGS := $(INCLUDES) $(CXXFLAGS_BASE) $(CXXFLAGS_WARN) $(CXXFLAGS_EXCLUDE)
 
 ifdef asm
@@ -39,12 +43,14 @@ ASMFLAGS := -f elf64
 endif
 
 
-ifdef shared
+# --- LINKER ---
 LINKER := amd64-elf-ld
+LINKER_FLAGS := -pie
+ifdef lib
 LINKER_FLAGS += -shared
-else
-LINKER := $(CXX)
-LINKER_FLAGS += -pie
+endif
+ifdef static
+LINKER_FLAGS += -static
 endif
 
 ifndef nostdlib
@@ -61,6 +67,7 @@ LINKER_FLAGS += -nostdlib -z max-page-size=0x1000
 LINKER_FLAGS += -z relro -z now
 
 
+# --- OBJS ---
 CXX_OBJS := $(shell cd src && find . -type f -iname '*.cpp' | sed 's/\.\///g' | sed 's/\.cpp/\.o/g' | xargs -I {} echo "$(OBJPATH)/"{})
 ifndef asm
 ALL_OBJS := $(shell echo "$(CXX_OBJS)" | xargs -n1 | sort | xargs)
@@ -75,7 +82,8 @@ all: $(RESULT)
 
 $(RESULT): $(ALL_OBJS)
 	@echo "[$(PROJNAME)] Linking..."
-	@$(LINKER) `find $(OBJPATH) -type f -iname '*.o'` -o $@ $(LINKER_FLAGS)
+	@$(LINKER) $(LINKER_FLAGS) $(ALL_OBJS) -o $@
+	@if [[ -v libstatic ]]; then ar rcs $(RESULTSTATIC) $(ALL_OBJS); fi
 	@echo "[$(PROJNAME)] Stripping..."
 	@strip $(RESULT)
 
@@ -101,4 +109,4 @@ $(OBJPATH):
 	@cd src && find . -type d -exec mkdir -p ../$(OBJPATH)/{} \;
 
 clean:
-	rm -rf $(RESULT) $(OBJPATH)/
+	rm -rf $(RESULT) $(RESULTSTATIC) $(OBJPATH)/
