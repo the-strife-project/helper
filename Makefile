@@ -83,7 +83,7 @@ all: $(RESULT)
 $(RESULT): $(ALL_OBJS)
 	@echo "[$(PROJNAME)] Linking..."
 	@$(LINKER) $(LINKER_FLAGS) $(ALL_OBJS) -o $@
-	@if [[ -v libstatic ]]; then ar rcs $(RESULTSTATIC) $(ALL_OBJS); fi
+	@if [[ -v RESULTSTATIC ]]; then ar rcs $(RESULTSTATIC) $(ALL_OBJS); fi
 	@echo "[$(PROJNAME)] Stripping..."
 	@strip $(RESULT)
 
