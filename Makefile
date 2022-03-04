@@ -86,7 +86,6 @@ all: $(RESULT)
 $(RESULT): $(ALL_OBJS)
 	@echo "[$(PROJNAME)] Linking..."
 	@$(LINKER) $(LINKER_FLAGS) $(ALL_OBJS) -o $@
-	@if [[ -v RESULTSTATIC ]]; then ar rcs $(RESULTSTATIC) $(ALL_OBJS); fi
 	@if [[ ! -v DEBUG ]]; then \
 		echo "[$(PROJNAME)] Stripping..."; \
 		strip $(RESULT); \
@@ -114,4 +113,4 @@ $(OBJPATH):
 	@cd src && find . -type d -exec mkdir -p ../$(OBJPATH)/{} \;
 
 clean:
-	rm -rf $(RESULT) $(RESULTSTATIC) $(OBJPATH)/
+	rm -rf $(RESULT) $(OBJPATH)/
