@@ -23,7 +23,7 @@ ifndef nostdlibh
 ifndef JOTAOS_STDLIB_HEADERS
 $(error $(ERR_HEADERS))
 endif
-INCLUDES += -I "$(JOTAOS_STDLIB_HEADERS)"
+INCLUDES += -I "$(JOTAOS_STDLIB_HEADERS)" -I "$(JOTAOS_STDLIB_HEADERS)/STL"
 endif
 
 CXXFLAGS_BASE := -std=c++11 -ffreestanding -O3 -fpic -fpie
@@ -34,6 +34,9 @@ CXXFLAGS_BASE += -export-dynamic -shared
 endif
 ifdef static
 CXXFLAGS_BASE += -static
+endif
+ifdef DEBUG
+CXXFLAGS_BASE += -g
 endif
 CXXFLAGS := $(INCLUDES) $(CXXFLAGS_BASE) $(CXXFLAGS_WARN) $(CXXFLAGS_EXCLUDE)
 
@@ -84,8 +87,10 @@ $(RESULT): $(ALL_OBJS)
 	@echo "[$(PROJNAME)] Linking..."
 	@$(LINKER) $(LINKER_FLAGS) $(ALL_OBJS) -o $@
 	@if [[ -v RESULTSTATIC ]]; then ar rcs $(RESULTSTATIC) $(ALL_OBJS); fi
-	@echo "[$(PROJNAME)] Stripping..."
-	@strip $(RESULT)
+	@if [[ ! -v DEBUG ]]; then \
+		echo "[$(PROJNAME)] Stripping..."; \
+		strip $(RESULT); \
+	fi
 
 -include $(CXX_OBJS:.o=.o.d)
 
