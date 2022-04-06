@@ -26,20 +26,18 @@ endif
 INCLUDES += -I "$(JOTAOS_STDLIB_HEADERS)" -I "$(JOTAOS_STDLIB_HEADERS)/STL"
 endif
 
-CXXFLAGS_BASE := -std=c++11 -ffreestanding -O3 -fpic -fpie
+CXXFLAGS_BASE := -std=c++11 -ffreestanding -O2 -fpic -fpie
 CXXFLAGS_WARN := -Wall -Wextra -Werror
 CXXFLAGS_EXCLUDE := -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-stack-protector -fomit-frame-pointer -mno-red-zone -mno-80387 -mno-mmx -mno-3dnow -mno-sse
 ifdef shared
 CXXFLAGS_BASE += -export-dynamic -shared
-endif
-ifdef static
-CXXFLAGS_BASE += -static
 endif
 ifdef DEBUG
 CXXFLAGS_BASE += -g
 endif
 CXXFLAGS := $(INCLUDES) $(CXXFLAGS_BASE) $(CXXFLAGS_WARN) $(CXXFLAGS_EXCLUDE)
 
+# --- ASM ---
 ifdef asm
 ASM := nasm
 ASMFLAGS := -f elf64
@@ -52,15 +50,18 @@ LINKER_FLAGS := -pie
 ifdef lib
 LINKER_FLAGS += -shared
 endif
-ifdef static
-LINKER_FLAGS += -static
-endif
+
+LINKER_FLAGS += -L$(JOTAOS_LIBS)
 
 ifndef nostdlib
 ifndef JOTAOS_LIBS
 $(error $(ERR_LIBS))
 endif
-LINKER_FLAGS += -L$(JOTAOS_LIBS) -lstd
+LINKER_FLAGS_END += -lstd
+endif
+
+ifdef static
+LINKER_FLAGS += -static
 endif
 
 ifdef LINKER_FILE
@@ -85,10 +86,14 @@ all: $(RESULT)
 
 $(RESULT): $(ALL_OBJS)
 	@echo "[$(PROJNAME)] Linking..."
-	@$(LINKER) $(LINKER_FLAGS) $(ALL_OBJS) -o $@
-	@if [[ ! -v DEBUG ]]; then \
+	@$(LINKER) $(LINKER_FLAGS) $(ALL_OBJS) $(LINKER_FLAGS_END) -o $@
+	@if [[ ! -z "$(DEBUG)" ]]; then \
 		echo "[$(PROJNAME)] Stripping..."; \
 		strip $(RESULT); \
+	fi
+	@if [[ ! -z "$(STATICRESULT)" ]]; then \
+		echo "[$(PROJNAME)] Creating static library..."; \
+		ar rcs $(STATICRESULT) $(ALL_OBJS); \
 	fi
 
 -include $(CXX_OBJS:.o=.o.d)
@@ -113,4 +118,4 @@ $(OBJPATH):
 	@cd src && find . -type d -exec mkdir -p ../$(OBJPATH)/{} \;
 
 clean:
-	rm -rf $(RESULT) $(OBJPATH)/
+	rm -rf $(RESULT) $(STATICRESULT) $(OBJPATH)/
