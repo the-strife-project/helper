@@ -46,7 +46,7 @@ endif
 
 # --- LINKER ---
 LINKER := amd64-elf-ld
-LINKER_FLAGS := -pie
+LINKER_FLAGS += -pie
 ifdef lib
 LINKER_FLAGS += -shared
 endif
@@ -87,7 +87,7 @@ all: $(RESULT)
 $(RESULT): $(ALL_OBJS)
 	@echo "[$(PROJNAME)] Linking..."
 	@$(LINKER) $(LINKER_FLAGS) $(ALL_OBJS) $(LINKER_FLAGS_END) -o $@
-	@if [[ ! -z "$(DEBUG)" ]]; then \
+	@if [[ ! -v DEBUG ]]; then \
 		echo "[$(PROJNAME)] Stripping..."; \
 		strip $(RESULT); \
 	fi
