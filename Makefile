@@ -26,7 +26,7 @@ endif
 INCLUDES += -I "$(JOTAOS_STDLIB_HEADERS)" -I "$(JOTAOS_STDLIB_HEADERS)/STL"
 endif
 
-CXXFLAGS_BASE := -std=c++11 -ffreestanding -O2 -fpic -fpie
+CXXFLAGS_BASE := -std=c++11 -ffreestanding -O2 -fpic -fpie -fPIC
 CXXFLAGS_WARN := -Wall -Wextra -Werror
 CXXFLAGS_EXCLUDE := -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-stack-protector -fomit-frame-pointer -mno-red-zone -mno-80387 -mno-mmx -mno-3dnow -mno-sse
 ifdef shared
