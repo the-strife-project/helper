@@ -13,6 +13,7 @@ ifndef RESULT
 $(error $(ERR_RESULT))
 endif
 
+SHELL := /bin/bash
 SRCPATH := src
 OBJPATH := obj
 
