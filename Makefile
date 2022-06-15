@@ -84,6 +84,7 @@ endif
 
 .PHONY: all clean
 all: $(RESULT)
+	@
 
 $(RESULT): $(ALL_OBJS)
 	@echo "[$(PROJNAME)] Linking..."
