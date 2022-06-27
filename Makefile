@@ -1,10 +1,9 @@
-# This is a given Makefile for all jotaOS user space programs
-# Read the documentation to understand its options
+# This is a given Makefile for all Strife projects
 
 ERR_PROJNAME := You have to set a project name (PROJNAME)
 ERR_RESULT := You have to set a result file (RESULT)
-ERR_HEADERS := Please set the JOTAOS_STDLIB_HEADERS environment variable to the pubheaders/ directory of stdlib
-ERR_LIBS := Please set the JOTAOS_LIBS environment variable to a directory containing the requested libraries
+ERR_HEADERS := Please set the STRIFE_STDLIB_HEADERS environment variable to the pubheaders/ directory of stdlib
+ERR_LIBS := Please set the STRIFE_LIBS environment variable to a directory containing the requested libraries
 
 ifndef PROJNAME
 $(error $(ERR_PROJNAME))
@@ -21,10 +20,10 @@ OBJPATH := obj
 CXX := amd64-elf-g++
 INCLUDES := -Isrc
 ifndef nostdlibh
-ifndef JOTAOS_STDLIB_HEADERS
+ifndef STRIFE_STDLIB_HEADERS
 $(error $(ERR_HEADERS))
 endif
-INCLUDES += -I "$(JOTAOS_STDLIB_HEADERS)" -I "$(JOTAOS_STDLIB_HEADERS)/STL"
+INCLUDES += -I "$(STRIFE_STDLIB_HEADERS)" -I "$(STRIFE_STDLIB_HEADERS)/STL"
 endif
 
 CXXFLAGS_BASE := -std=c++11 -ffreestanding -O2 -fpic -fpie -fPIC
@@ -52,10 +51,10 @@ ifdef lib
 LINKER_FLAGS += -shared
 endif
 
-LINKER_FLAGS += -L$(JOTAOS_LIBS)
+LINKER_FLAGS += -L$(STRIFE_LIBS)
 
 ifndef nostdlib
-ifndef JOTAOS_LIBS
+ifndef STRIFE_LIBS
 $(error $(ERR_LIBS))
 endif
 LINKER_FLAGS_END += -lstd
