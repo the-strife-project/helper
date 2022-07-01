@@ -111,7 +111,7 @@ $(CXX_OBJS): $(OBJPATH)/%.o: $(SRCPATH)/%.cpp
 ifdef asm
 $(ASM_OBJS): $(OBJPATH)/%.o: $(SRCPATH)/%.asm
 	@echo "[$(PROJNAME)] ===> $<"
-	@$(ASM) $< -o $@ $(ASMFLAGS)
+	@$(ASM) -i $(shell dirname $<) $< -o $@ $(ASMFLAGS)
 endif
 
 $(OBJPATH):
