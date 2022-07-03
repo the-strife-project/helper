@@ -1,5 +1,7 @@
 # This is a given Makefile for all Strife projects
 
+MAKEFLAGS += -s
+
 ERR_PROJNAME := You have to set a project name (PROJNAME)
 ERR_RESULT := You have to set a result file (RESULT)
 ERR_HEADERS := Please set the STRIFE_STDLIB_HEADERS environment variable to the pubheaders/ directory of stdlib
