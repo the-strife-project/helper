@@ -72,6 +72,8 @@ LINKER_FLAGS += -z relro -z now
 
 
 # --- OBJS ---
+OBJPATHS := $(shell cd src && find . -type d | xargs -I {} echo "$(OBJPATH)/"{})
+
 CXX_OBJS := $(shell cd src && find . -type f -iname '*.cpp' | sed 's/\.\///g' | sed 's/\.cpp/\.o/g' | xargs -I {} echo "$(OBJPATH)/"{})
 ifndef asm
 ALL_OBJS := $(shell echo "$(CXX_OBJS)" | xargs -n1 | sort | xargs)
@@ -99,7 +101,7 @@ $(RESULT): $(ALL_OBJS)
 
 -include $(CXX_OBJS:.o=.o.d)
 
-$(ALL_OBJS): | $(OBJPATH)
+$(ALL_OBJS): | $(OBJPATHS)
 
 $(CXX_OBJS): $(OBJPATH)/%.o: $(SRCPATH)/%.cpp
 	@echo "[$(PROJNAME)] ===> $<"
@@ -114,9 +116,8 @@ $(ASM_OBJS): $(OBJPATH)/%.o: $(SRCPATH)/%.asm
 	@$(ASM) -i $(shell dirname $<) $< -o $@ $(ASMFLAGS)
 endif
 
-$(OBJPATH):
-	@echo "[$(PROJNAME)] Creating $(OBJPATH)/ hierarchy..."
-	@cd src && find . -type d -exec mkdir -p ../$(OBJPATH)/{} \;
+$(OBJPATHS): $(OBJPATH)/%: $(SRCPATH)/%
+	@mkdir -p $(OBJPATH)/$*
 
 clean:
 	rm -rf $(RESULT) $(STATICRESULT) $(OBJPATH)/
