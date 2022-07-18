@@ -43,6 +43,9 @@ CXXFLAGS := $(INCLUDES) $(CXXFLAGS_BASE) $(CXXFLAGS_WARN) $(CXXFLAGS_EXCLUDE)
 ifdef asm
 ASM := nasm
 ASMFLAGS := -f elf64
+ifdef DEBUG
+ASMFLAGS += -g
+endif
 endif
 
 
